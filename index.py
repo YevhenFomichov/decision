@@ -48,23 +48,30 @@ def predict_audio_class(audio_path: str, model_path: str = 'decision_tree_model.
 
 def main():
     st.title("Audio Classification App")
-    st.write("Загрузите аудиофайл (wav, mp3, m4a и т.д.), чтобы получить предсказание.")
+    st.write("Upload an audio file (wav, mp3, m4a, etc.) to get a prediction")
 
-    audio_file = st.file_uploader("Выберите аудиофайл", type=['wav', 'mp3', 'm4a'])
+    audio_file = st.file_uploader("Select an audio file", type=['wav', 'mp3', 'm4a'])
 
     if audio_file is not None:
-        # Сохраняем загруженный файл во временный, чтобы librosa мог его прочитать
+        # Сохраняем загруженный файл во временный
         with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
             tmp_file.write(audio_file.read())
             tmp_file_path = tmp_file.name
 
-        # Предполагаем, что модель лежит рядом с index.py
+        # Путь к модели
         model_path = "decision_tree_model.joblib"
 
-        # Вызываем функцию предсказания
+        # Получаем числовой результат предсказания (0 или 1)
         predicted_class = predict_audio_class(tmp_file_path, model_path)
-        st.write(f"Предсказанный класс: **{predicted_class}**")
 
+        # Превращаем числовой результат в текст
+        if predicted_class == 0:
+            st.write("Predicted class: **Empty**")
+        elif predicted_class == 1:
+            st.write("Predicted class: **Full**")
+        else:
+            # На случай, если модель будет возвращать что-то отличное от 0 или 1
+            st.write(f"Predicted class: **{predicted_class}**")
 
 if __name__ == "__main__":
     main()
